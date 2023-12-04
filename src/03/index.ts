@@ -4,6 +4,7 @@ import path from 'path';
 const file = fs.readFileSync(path.join(__dirname, './input.txt'), 'utf8');
 const inputs = file.split('\n');
 
+// Part 1
 const transformed = inputs.reduce<
   { numberAsString: string; index: number }[][]
 >((acc, val, index) => {
@@ -30,11 +31,7 @@ const isSymbol = (char: string | undefined) => {
   return char !== '.' && isNaN(Number(char));
 };
 
-const checkForNeighbourSymbol = (
-  number: string,
-  index1: number,
-  index2: number
-) => {
+const checkForNeighbourSymbol = (index1: number, index2: number) => {
   const topLeft = isSymbol(inputs[index1 - 1]?.[index2 - 1]);
   const top = isSymbol(inputs[index1 - 1]?.[index2]);
   const topRight = isSymbol(inputs[index1 - 1]?.[index2 + 1]);
@@ -61,7 +58,7 @@ const result = transformed.reduce((acc, row, index1) => {
     let valid = false;
     for (let i = 0; i < num.numberAsString.length; i++) {
       const index2 = num.index + i;
-      valid = checkForNeighbourSymbol(num.numberAsString, index1, index2);
+      valid = checkForNeighbourSymbol(index1, index2);
       if (valid) {
         return true;
       }
@@ -76,3 +73,73 @@ const result = transformed.reduce((acc, row, index1) => {
 }, 0);
 
 console.log(result);
+
+// Part 2
+const gears = inputs.reduce<{ value: string; index: number }[][]>(
+  (acc, val, index) => {
+    if (!acc[index]) {
+      acc[index] = [];
+    }
+    const res = val.matchAll(/\*/g);
+    let match: IteratorResult<RegExpMatchArray, any> | null = null;
+    while ((match = res.next()) && !match.done) {
+      acc[index].push({
+        value: '*',
+        index: match.value.index!,
+      });
+    }
+    return acc;
+  },
+  []
+);
+
+const checkForNeighbourNumbers = (index1: number, column: number) => {
+  const res: number[] = [];
+  const top = transformed[index1 - 1].find((v) => {
+    const numberstartindex = v.index;
+    const numberendindex = v.index + v.numberAsString.length - 1;
+    return (
+      (column >= numberstartindex && column <= numberendindex) ||
+      column === numberstartindex - 1 ||
+      column === numberendindex + 1
+    );
+  });
+  if (top) {
+    res.push(Number(top.numberAsString));
+  }
+  const same = transformed[index1].find((v) => {
+    const numberstartindex = v.index;
+    const numberendindex = v.index + v.numberAsString.length - 1;
+    return column === numberendindex + 1 || column === numberstartindex - 1;
+  });
+  if (same) {
+    res.push(Number(same.numberAsString));
+  }
+  const bottom = transformed[index1 + 1].find((v) => {
+    const numberstartindex = v.index;
+    const numberendindex = v.index + v.numberAsString.length - 1;
+    return (
+      (column >= numberstartindex && column <= numberendindex) ||
+      column === numberstartindex - 1 ||
+      column === numberendindex + 1
+    );
+  });
+
+  if (bottom) {
+    res.push(Number(bottom.numberAsString));
+  }
+
+  return res;
+};
+
+const result2 = gears.reduce((acc, row, index1) => {
+  row.forEach((gear) => {
+    const valid = checkForNeighbourNumbers(index1, gear.index);
+    if (valid.length === 2) {
+      return (acc += valid[0] * valid[1]);
+    }
+  });
+  return acc;
+}, 0);
+
+console.log(result2);
