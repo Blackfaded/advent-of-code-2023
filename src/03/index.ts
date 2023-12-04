@@ -98,35 +98,63 @@ const checkForNeighbourNumbers = (index1: number, column: number) => {
   const top = transformed[index1 - 1].find((v) => {
     const numberstartindex = v.index;
     const numberendindex = v.index + v.numberAsString.length - 1;
-    return (
-      (column >= numberstartindex && column <= numberendindex) ||
-      column === numberstartindex - 1 ||
-      column === numberendindex + 1
-    );
+    return column >= numberstartindex && column <= numberendindex;
   });
   if (top) {
     res.push(Number(top.numberAsString));
   }
-  const same = transformed[index1].find((v) => {
-    const numberstartindex = v.index;
+  const top1 = transformed[index1 - 1].find((v) => {
     const numberendindex = v.index + v.numberAsString.length - 1;
-    return column === numberendindex + 1 || column === numberstartindex - 1;
+    return column === numberendindex + 1;
+  });
+  if (top1) {
+    res.push(Number(top1.numberAsString));
+  }
+
+  const top2 = transformed[index1 - 1].find((v) => {
+    const numberstartindex = v.index;
+    return column === numberstartindex - 1;
+  });
+  if (top2) {
+    res.push(Number(top2.numberAsString));
+  }
+  const same = transformed[index1].find((v) => {
+    const numberendindex = v.index + v.numberAsString.length - 1;
+    return column === numberendindex + 1;
   });
   if (same) {
     res.push(Number(same.numberAsString));
   }
+
+  const same2 = transformed[index1].find((v) => {
+    const numberstartindex = v.index;
+    return column === numberstartindex - 1;
+  });
+  if (same2) {
+    res.push(Number(same2.numberAsString));
+  }
   const bottom = transformed[index1 + 1].find((v) => {
     const numberstartindex = v.index;
     const numberendindex = v.index + v.numberAsString.length - 1;
-    return (
-      (column >= numberstartindex && column <= numberendindex) ||
-      column === numberstartindex - 1 ||
-      column === numberendindex + 1
-    );
+    return column >= numberstartindex && column <= numberendindex;
   });
-
   if (bottom) {
     res.push(Number(bottom.numberAsString));
+  }
+  const bottom1 = transformed[index1 + 1].find((v) => {
+    const numberendindex = v.index + v.numberAsString.length - 1;
+    return column === numberendindex + 1;
+  });
+  if (bottom1) {
+    res.push(Number(bottom1.numberAsString));
+  }
+
+  const bottom2 = transformed[index1 + 1].find((v) => {
+    const numberstartindex = v.index;
+    return column === numberstartindex - 1;
+  });
+  if (bottom2) {
+    res.push(Number(bottom2.numberAsString));
   }
 
   return res;
